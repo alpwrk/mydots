@@ -1,0 +1,214 @@
+# Sway config. Read `man 5 sway` for the full reference.
+
+# --- Variables ---
+# $mod = Super. Switch to Mod1 if you prefer Alt.
+set $mod Mod4
+# Vim-style direction keys for focus/move/resize bindings
+set $left h
+set $down j
+set $up k
+set $right l
+set $term ghostty
+# dmenu_path gives rofi the list of executables; xargs swaymsg exec keeps the
+# new window on the workspace the launcher was opened on.
+set $menu dmenu_path | rofi -m -1 -show drun | xargs swaymsg exec --
+
+# --- Outputs / wallpaper ---
+# Get output names with: swaymsg -t get_outputs
+output * bg ~/Pictures/wallpapers/uiadsofsa.png fill
+
+# --- Inputs ---
+# Keyboard layout. Get input names with: swaymsg -t get_inputs
+input type:keyboard {
+	xkb_layout de
+}
+# TrackPoint: flat profile, no acceleration. Commented G305 block is for when
+# I use that mouse instead.
+input "1267:128:Elan_TrackPoint" {
+	accel_profile flat
+	pointer_accel 0
+}
+#input "1133:16500:Logitech_G305" {
+#	accel_profile "flat"
+#	pointer_accel 0.5
+#}
+
+# --- Basics ---
+    bindsym $mod+Return exec $term
+    bindsym $mod+Shift+q kill
+    bindsym $mod+d exec $menu
+
+    # opencode in its own Ghostty window, slightly transparent
+    bindsym $mod+Shift+o exec ghostty --gtk-single-instance=false --background-opacity=0.8 -e opencode
+
+    # Hold $mod + left mouse button to drag windows, right button to resize.
+    # Works for tiled windows too. Change normal to inverse to swap buttons.
+    floating_modifier $mod normal
+
+    # Full restart of waybar so style changes actually apply
+    bindsym $mod+Shift+c exec pkill -x waybar; reload
+
+    # Logout confirmation prompt
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+
+# --- Focus movement ---
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+    # Same thing with arrow keys
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+# --- Move windows ---
+    # Same as focus movement but with Shift added
+    bindsym $mod+Shift+$left move left
+    bindsym $mod+Shift+$down move down
+    bindsym $mod+Shift+$up move up
+    bindsym $mod+Shift+$right move right
+    bindsym $mod+Shift+Left move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move right
+
+# --- Workspaces ---
+    bindsym $mod+1 workspace number 1
+    bindsym $mod+2 workspace number 2
+    bindsym $mod+3 workspace number 3
+    bindsym $mod+4 workspace number 4
+    bindsym $mod+5 workspace number 5
+    bindsym $mod+6 workspace number 6
+    bindsym $mod+7 workspace number 7
+    bindsym $mod+8 workspace number 8
+    bindsym $mod+9 workspace number 9
+    bindsym $mod+0 workspace number 10
+    bindsym $mod+Shift+1 move container to workspace number 1
+    bindsym $mod+Shift+2 move container to workspace number 2
+    bindsym $mod+Shift+3 move container to workspace number 3
+    bindsym $mod+Shift+4 move container to workspace number 4
+    bindsym $mod+Shift+5 move container to workspace number 5
+    bindsym $mod+Shift+6 move container to workspace number 6
+    bindsym $mod+Shift+7 move container to workspace number 7
+    bindsym $mod+Shift+8 move container to workspace number 8
+    bindsym $mod+Shift+9 move container to workspace number 9
+    bindsym $mod+Shift+0 move container to workspace number 10
+
+# --- Layout ---
+    # Split current container horizontally / vertically
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
+
+    bindsym $mod+s layout stacking
+    # Extra kill shortcut, $mod+Shift+q is a two-hander
+    bindsym $mod+w kill
+    bindsym $mod+e layout toggle split
+
+    bindsym $mod+f fullscreen
+
+    # Float the focused window
+    bindsym $mod+Shift+space floating toggle
+    # Jump between tiling and floating area
+    bindsym $mod+space focus mode_toggle
+
+    bindsym $mod+a focus parent
+
+# --- Scratchpad ---
+    # Stash windows and pull them back later. $mod+minus cycles through them.
+    bindsym $mod+Shift+minus move scratchpad
+    bindsym $mod+minus scratchpad show
+
+# --- Resize mode ---
+# $mod+r enters, Escape or Return leaves.
+mode "resize" {
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# --- Bar ---
+# sway just hands the bar over to waybar
+bar {
+    swaybar_command waybar
+}
+
+# --- Look ---
+# Minimal 2px borders, white for focused and grey for the rest
+default_border pixel 2
+client.focused #ffffff #ffffff #ffffff #ffffff #ffffff
+client.focused_inactive #808080 #808080 #808080 #808080 #808080
+client.unfocused #808080 #808080 #808080 #808080 #808080
+gaps inner 3
+gaps outer 3
+
+# --- Window rules ---
+# Flameshot: borderless, floating, forced to top-left (grim-style area selection)
+for_window [app_id="flameshot"] border pixel 0, floating enable, fullscreen disable, move absolute position 0 0
+# Zen browser runs with reduced opacity
+for_window [app_id="zen"] opacity 0.7
+# Toggle that opacity on the fly (AltGr+t)
+bindsym $mod+Mod5+t exec ~/.local/bin/zen-opacity-toggle
+
+# --- Screenshots ---
+# Print = area to clipboard, Shift+Print = area saved to ~/Pictures/Screenshots
+bindsym Print exec grim -g "$(slurp)" - | wl-copy
+bindsym Shift+Print exec grim -g "$(slurp)" ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png
+
+# --- Media keys (PipeWire) ---
+# --locked so they work while the session is locked
+bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+
+# Brightness
+bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+
+# Playback
+bindsym --locked XF86AudioPlay exec playerctl play-pause
+bindsym --locked XF86AudioPause exec playerctl play-pause
+bindsym --locked XF86AudioNext exec playerctl next
+bindsym --locked XF86AudioPrev exec playerctl previous
+bindsym --locked XF86AudioStop exec playerctl stop
+
+# --- Media keys without media keys ---
+# For the external keyboard: Ctrl+Alt+ü/ö/ä as play/prev/next
+bindsym --locked Control+Mod1+udiaeresis exec playerctl play-pause
+bindsym --locked Control+Mod1+odiaeresis exec playerctl previous
+bindsym --locked Control+Mod1+adiaeresis exec playerctl next
+
+# --- Startup ---
+# Needed so systemd services and the polkit agent can talk to the Wayland session
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec /usr/lib/polkit-kde-authentication-agent-1
+
+include /etc/sway/config.d/*
+
+# --- SwayFX ---
+# Plain sway ignores these, they only work with swayfx.
+blur enable
+blur_passes 4
+blur_radius 1
+blur_noise 0.02
+corner_radius 2
+shadows enable
+default_dim_inactive 0.2
+animation_duration_ms 250
+
+# Waybar must not get the corner radius/shadow treatment, it sits flush at the top
+layer_effects "waybar" {
+    corner_radius 0;
+    shadows disable;
+}
