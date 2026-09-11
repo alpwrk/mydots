@@ -15,6 +15,8 @@ set $menu dmenu_path | rofi -m -1 -show drun | xargs swaymsg exec --
 
 # --- Outputs / wallpaper ---
 # Get output names with: swaymsg -t get_outputs
+# Copy of the wallpaper lives in sway/wallpaper/ in the repo, the config
+# just points at ~/Pictures so switching wallpapers doesn't need an edit.
 output * bg ~/Pictures/wallpapers/uiadsofsa.png fill
 
 # --- Inputs ---

@@ -40,8 +40,10 @@ the spare update module, which is disabled anyway).
 ## Things worth knowing
 - waybar expects `batstats.sh` and `metastats.sh` next to its config, and they
   need to be executable (`chmod +x`).
-- The wallpaper path in `sway/config` and the `@theme` path in `rofi/config.rasi`
-  are hardcoded to my home, fix those after cloning.
+- The wallpaper is in `sway/wallpaper/`, copy it over:
+  `mkdir -p ~/Pictures/wallpapers && cp sway/wallpaper/*.png ~/Pictures/wallpapers/`
+- The `@theme` path in `rofi/config.rasi` is hardcoded to my home, fix that
+  after cloning.
 - `rofi/mono.rasi` is the actual theme, `config.rasi` only points to it.
 
 Super+D launches apps, Super+Enter opens ghostty, Super+R resizes.
